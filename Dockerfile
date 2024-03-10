@@ -1,15 +1,19 @@
-# Use a base image that supports systemd, for example, Ubuntu
-FROM ubuntu:20.04
+# Use the latest Ubuntu image
+FROM ubuntu:latest
 
-# Install necessary packages
-RUN apt-get update && \
-apt-get install -y shellinabox && \
-apt-get clean && \
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN echo 'root:root' | chpasswd
+# Update and install required packages
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip
 
-# Expose the web-based terminal port
-EXPOSE 4200
+# Set the working directory
+WORKDIR /app
 
-# Start shellinabox in foreground mode
-CMD ["/usr/bin/shellinaboxd", "-t", "-s", "/:LOGIN", "-b"]
+# Install JupyterLab
+RUN pip3 install jupyterlab
+
+# Expose port 8080
+EXPOSE 8080
+
+# Start JupyterLab on port 8080 without authentication
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8080", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
